@@ -22,5 +22,9 @@ Data scripts are contained in the *./data-scripts* folder
 * *sigmoid.py* - Script to predict data for India
 * *requirements.in* - Python requirements template for pip-tools
 
+### Miscellaneous files
+* *maps-master/States* - Map shapefiles for Indian states
+* *misc scripts - not used* - Scripts used to test prediction model and miscellaneous data pulls
+
 ## Author
 * Siddharth Kumar Singh
