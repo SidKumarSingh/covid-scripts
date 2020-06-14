@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 #####################################
 # Created on 02 May 2020            #
-# Last modified on 04 June 2020     #
+# Last modified on 15 June 2020     #
 #                                   #
 # @author: siddharth-kumar-singh    #
 #####################################
 # Changelog:                        
 # 28-May-2020: Changed prediction o/p to Excel based on module changes
 # 04-Jun-2020: cd_lookup called before modules to remove redundancy
+# 15-Jun-2020: Added temporary code to adjust India data in global TS
+# 15-Jun-2020: Passing TS to prediction module to reduce additional data fetch
 #####################################
 import pandas as pd
 from get_India import get_India_data
@@ -32,7 +34,8 @@ data_f = get_global_summary(data_ind)
 print('\tGlobal Daily summary complete')
 
 #### Time Summary data
-data_ts = get_global_ts()
+ind_tot = data_ind.Confirmed.sum()
+data_ts = get_global_ts(ind_tot)
 print('\tGlobal Time summary complete')
 
 #### Oxford Data
@@ -44,7 +47,7 @@ data_dr = doubling(data_ts, cd_lookup)
 print('\tDoubling rate computation complete')
 
 #### Predictions data
-data_pred = get_predictions()
+data_pred = get_predictions(data_ts[data_ts['Country_Region']=='India'].iloc[:,1:])
 print('\tPrediction computation complete')
 
 #### Capital markets data

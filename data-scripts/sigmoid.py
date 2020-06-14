@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 #####################################
 # Created on 02 May 2020            #
-# Last modified on 01 June 2020     #
+# Last modified on 15 June 2020     #
 #                                   #
 # @author: siddharth-kumar-singh    #
 #####################################
 # Changelog:                        
 # 28-May-2020: Fixed SettingWithCopyWarning on data_final FOR loop at end
 # 01-Jun-2020: Changed logic for c_max calculation
+# 15-Jun-2020: Receiving time series from main module
 #####################################
 # %%
 import pandas as pd, numpy as np
@@ -60,11 +61,14 @@ def __forecast_g(ts, f, model):
     dtf = pd.DataFrame(np.array(preds),index=index, columns=['A_P','Change_A', 'Change_L', 'Change_W'])
     return dtf
 
-def get_predictions():
-    conf_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
+def get_predictions(conf):
+    # conf_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
 
     # Confirmed cases
-    conf = pd.read_csv(conf_url, encoding='utf-8', index_col=1).loc['India'].rename('Confirmed').iloc[3:]
+    # conf = pd.read_csv(conf_url, encoding='utf-8', index_col=1).loc['India'].rename('Confirmed').iloc[3:]
+
+    conf.set_index('Date',append=False,inplace=True,drop=True)
+
     conf.index = pd.to_datetime(conf.index,format='%m/%d/%y')
 
     data_df = pd.DataFrame(conf)
@@ -113,5 +117,5 @@ def get_predictions():
             data_final.at[i,'Confirmed'] = data_final['Confirmed'].iloc[i-1] + data_final['Change_A'].iloc[i]
     return data_final
 
-get_predictions().to_excel('C:\\NRI\\COVID-19\\Predictions.xlsx',sheet_name='Predictions',index=False)
+#get_predictions().to_excel('C:\\NRI\\COVID-19\\Predictions.xlsx',sheet_name='Predictions',index=False)
 # %%
