@@ -33,15 +33,15 @@ def get_global_ts(ind_cnt):
     ind_data = data_ts[(data_ts['Country_Region']=='India')&(data_ts['Date']>dt)].iloc[:,2]
 
     for i in range(len(ind_data)):
-        data_ts.Confirmed[(data_ts['Country_Region']=='India')&(data_ts['Date']==dt)] = ind_data.iat[i]
+        data_ts.at[(data_ts['Country_Region']=='India')&(data_ts['Date']==dt),'Confirmed'] = ind_data.iat[i]
         dt += timedelta(days=1)
 
-    data_ts.Confirmed[(data_ts['Country_Region']=='India')&(data_ts['Date']==dt)] = ind_cnt
+    data_ts.at[(data_ts['Country_Region']=='India')&(data_ts['Date']==dt),'Confirmed'] = ind_cnt
+    #print(data_ts[data_ts['Country_Region']=='India'])
 
     ######
 
     return data_ts
 
-#get_global_ts(320922)
-
+#get_global_ts(332424)
 # %%
