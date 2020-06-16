@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #####################################
 # Created on 02 May 2020            #
-# Last modified on 15 June 2020     #
+# Last modified on 16 June 2020     #
 #                                   #
 # @author: siddharth-kumar-singh    #
 #####################################
@@ -10,10 +10,11 @@
 # 04-Jun-2020: cd_lookup called before modules to remove redundancy
 # 15-Jun-2020: Added temporary code to adjust India data in global TS
 # 15-Jun-2020: Passing TS to prediction module to reduce additional data fetch
+# 16-Jun-2020: Passing summary data to two modules
 #####################################
-import pandas as pd
-from get_India import get_India_data
-from get_global_summ import get_global_summary
+# %%
+import pandas as pd, requests
+from datetime import datetime, timedelta
 from get_global_ts import get_global_ts
 from get_ox_data import get_ox_data
 from doubling import doubling
@@ -25,12 +26,35 @@ print('Fetching data...')
 #### Load original coords table
 cd_lookup = pd.read_excel('C:\\NRI\\COVID-19\\Data_summary.xlsx',sheet_name='Coords',index_col=0)
 
+#### Load global summary file
+base_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/'
+day_diff = 1
+dt_str = datetime.strftime(datetime.today()-timedelta(days=day_diff),'%m-%d-%Y') + '.csv'
+
+r = requests.get(base_url + dt_str)
+
+while r.ok == False:
+    day_diff+=1
+    dt_str = datetime.strftime(datetime.today()-timedelta(days=day_diff),'%m-%d-%Y') + '.csv'
+    r = requests.get(base_url + dt_str)
+
+data = pd.read_csv(base_url + dt_str, index_col=False,usecols=[2,3,4,7,8,9],parse_dates=['Last_Update'],infer_datetime_format=True,dtype={'Confirmed':'Int64','Deaths':'Int64','Recovered':'Int64'})
+
 #### India data
-data_ind = get_India_data()
+data_ind = data[data['Country_Region']=='India'].set_index('Province_State')
+data_ind.drop(columns=['Country_Region'],inplace=True)
+ind_st = pd.read_excel('C:\\NRI\\COVID-19\\Data_summary.xlsx',sheet_name='India',index_col=0, usecols=[0,5])
+data_ind = data_ind.join(ind_st)
 print('\tIndia Daily summary complete')
 
 #### Global Daily summary
-data_f = get_global_summary(data_ind)
+data_f = data.iloc[:,1:].groupby('Country_Region').agg(
+        Last_Update = ('Last_Update','max'),
+        Confirmed = ('Confirmed','sum'),
+        Deaths = ('Deaths','sum'),
+        Recovered = ('Recovered','sum'))
+
+data_f.sort_index(inplace=True)
 print('\tGlobal Daily summary complete')
 
 #### Time Summary data
