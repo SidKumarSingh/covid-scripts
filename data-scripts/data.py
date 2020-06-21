@@ -63,7 +63,8 @@ data_ts = get_global_ts(ind_tot)
 print('\tGlobal Time summary complete')
 
 #### Oxford Data
-data_ox = get_ox_data(data_ts, cd_lookup)
+#data_ox = get_ox_data(data_ts, cd_lookup)
+data_ox = pd.read_excel('C:\\NRI\\COVID-19\\Data_summary.xlsx',sheet_name='Gov_Action',index_col=False)
 print('\tGovernment Response binning complete')
 
 #### Doubling rate calculation
