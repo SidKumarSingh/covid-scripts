@@ -16255,6 +16255,7 @@ data-scripts/__pycache__/get_global_summ.cpython-38.pyc
 data-scripts/__pycache__/get_global_ts.cpython-38.pyc
 data-scripts/__pycache__/get_ox_data.cpython-38.pyc
 data-scripts/__pycache__/sigmoid.cpython-38.pyc
+data-scripts/data.bat
 maps-master/README.md
 misc scripts - not used/Capital_markets_indices.py
 misc scripts - not used/geckodriver.log

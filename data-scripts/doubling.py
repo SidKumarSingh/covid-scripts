@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 #####################################
 # Created on 02 May 2020            #
-# Last modified on 04 June 2020     #
+# Last modified on 23 June 2020     #
 #                                   #
 # @author: siddharth-kumar-singh    #
 #####################################
 # Changelog:                        
 # 04-Jun-2020: Added doubling buckets for 1mn+
+# 23-Jun-2020: Added doubling bucket for 2mn+
 #####################################
 # %%
 import pandas as pd
@@ -34,13 +35,13 @@ def doubling(data_ts, cd_lookup):
     cnt_list=['IND','JPN','CHN','USA','GBR','ITA']
     data_r = data_r.loc[cnt_list]
 
-    case_cnt = [1, 100, 1000, 2000, 4000, 6000, 10000, 20000, 40000, 80000, 150000, 300000, 600000, 1000000, 2000000]
+    case_cnt = [1, 100, 1000, 2000, 4000, 6000, 10000, 20000, 40000, 80000, 150000, 300000, 600000, 1000000, 2000000, 4000000]
 
     data_dr = data_r.groupby('CountryCode').apply(__cnt_bins,case_cnt).reset_index(level=1,drop=True)
     return data_dr
 
-cd_lookup = pd.read_excel('C:\\NRI\\COVID-19\\Data_summary.xlsx',sheet_name='Coords',index_col=0)
-data_ts = pd.read_excel('C:\\NRI\\COVID-19\\Data_summary.xlsx',sheet_name='Time Series', index_col=False)
-doubling(data_ts,cd_lookup)
+#cd_lookup = pd.read_excel('C:\\NRI\\COVID-19\\Data_summary.xlsx',sheet_name='Coords',index_col=0)
+#data_ts = pd.read_excel('C:\\NRI\\COVID-19\\Data_summary.xlsx',sheet_name='Time Series', index_col=False)
+#doubling(data_ts,cd_lookup)
 
 # %%
