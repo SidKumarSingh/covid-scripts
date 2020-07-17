@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #####################################
 # Created on 02 May 2020            #
-# Last modified on 15 June 2020     #
+# Last modified on 17 July 2020     #
 #                                   #
 # @author: siddharth-kumar-singh    #
 #####################################
@@ -9,6 +9,7 @@
 # 28-May-2020: Fixed SettingWithCopyWarning on data_final FOR loop at end
 # 01-Jun-2020: Changed logic for c_max calculation
 # 15-Jun-2020: Receiving time series from main module
+# 17-July-2020: Modified starting parameters for curve_fit
 #####################################
 # %%
 import pandas as pd, numpy as np
@@ -76,13 +77,13 @@ def get_predictions(conf):
     data_df['Change'] = data_df['Change'].fillna(method='bfill')
     data_df = data_df.astype('int64')
 
-    #maxfev = int(1e3)
+    maxfev = int(2e5)
     lognorm_model,_ = curve_fit(__lognorm,
         xdata=np.arange(len(data_df['Change']))[-25:],
         ydata=data_df['Change'].to_numpy()[-25:],
-        #maxfev = maxfev,
-        p0=[0.2,4000,3.5,0.3],
-        bounds=(0, np.array([1,10000,10,1])))
+        maxfev = maxfev,
+        p0=[0.15,800000,3.5,0.25],
+        bounds=(0, np.array([1,1000000,10,1])))
     
     pred_x = __forecast_g(data_df['Change'].index, __lognorm, lognorm_model)
     c_max = (pred_x['Change_L'].astype('int32') + pred_x['Change_W'].astype('int32')).max()
@@ -103,7 +104,7 @@ def get_predictions(conf):
             r = i+1
             break
     
-    d = {'Ref':[int(round(c_max*0.5)),int(round(c_max*0.3)),int(round(c_max*0.5))],'Mark':[f'End 97% on\n{l97_dt.strftime("%d %B %Y")}',f'End 99% on\n{l99_dt.strftime("%d %B %Y")}',f'No new cases on\n{l_dt.strftime("%d %B %Y")}']}
+    d = {'Ref':[int(round(c_max*0.7)),int(round(c_max*0.5)),int(round(c_max*0.5))],'Mark':[f'End 97% on\n{l97_dt.strftime("%d %B %Y")}',f'End 99% on\n{l99_dt.strftime("%d %B %Y")}',f'No new cases on\n{l_dt.strftime("%d %B %Y")}']}
     pred_final = pd.DataFrame(data=d, index=[l97_dt, l99_dt, l_dt])
 
     data_final = pd.concat([data_df,pred_x,pred_final],axis=1)
@@ -117,5 +118,8 @@ def get_predictions(conf):
             data_final.at[i,'Confirmed'] = data_final['Confirmed'].iloc[i-1] + data_final['Change_A'].iloc[i]
     return data_final
 
-#get_predictions().to_excel('C:\\NRI\\COVID-19\\Predictions.xlsx',sheet_name='Predictions',index=False)
+#conf_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
+
+#conf = pd.read_csv(conf_url, encoding='utf-8', index_col=1).loc['India'].rename('Confirmed').iloc[3:]
+#get_predictions(conf).to_excel('C:\\NRI\\COVID-19\\Predictions.xlsx',sheet_name='Predictions',index=False)
 # %%
