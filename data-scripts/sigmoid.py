@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #####################################
 # Created on 02 May 2020            #
-# Last modified on 17 July 2020     #
+# Last modified on 21 July 2020     #
 #                                   #
 # @author: siddharth-kumar-singh    #
 #####################################
@@ -10,6 +10,7 @@
 # 01-Jun-2020: Changed logic for c_max calculation
 # 15-Jun-2020: Receiving time series from main module
 # 17-July-2020: Modified starting parameters for curve_fit
+# 21-July-2021: Modified starting parameters for curve_fit
 #####################################
 # %%
 import pandas as pd, numpy as np
@@ -82,8 +83,8 @@ def get_predictions(conf):
         xdata=np.arange(len(data_df['Change']))[-25:],
         ydata=data_df['Change'].to_numpy()[-25:],
         maxfev = maxfev,
-        p0=[0.15,800000,3.5,0.25],
-        bounds=(0, np.array([1,1000000,10,1])))
+        p0=[0.1,1300000,3.5,0.25],
+        bounds=(0, np.array([1,5000000,10,1])))
     
     pred_x = __forecast_g(data_df['Change'].index, __lognorm, lognorm_model)
     c_max = (pred_x['Change_L'].astype('int32') + pred_x['Change_W'].astype('int32')).max()
