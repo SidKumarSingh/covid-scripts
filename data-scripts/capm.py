@@ -37,7 +37,11 @@ def get_capm_data():
     for idx in i2_list.index:
         time.sleep(1)
         url = f'http://api.bseindia.com/BseIndiaAPI/api/ProduceCSVForDate/w?strIndex={idx}&dtFromDate={from_date}&dtToDate={to_date}'
+        #try:
         df = pd.read_csv(url, index_col=0, infer_datetime_format=True, usecols=[0,4], squeeze=True, dtype=np.float64, parse_dates=[0],encoding='utf-8')
+        #except:
+        #    print(idx)
+        #    continue
         df.dropna(axis=1,inplace=True)
         df.insert(loc=0,column='Name',value=i2_list.at[idx,'Name'])
         df = df.reset_index().rename(columns={'index':'Date','Date':'Close'})
@@ -87,4 +91,3 @@ def get_capm_data():
         scrip_data = scrip_data.append(df,ignore_index=True)
     print('\tScrips data complete')
     return idx_data, i2_data, scrip_data
-# %%
