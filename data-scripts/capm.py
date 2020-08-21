@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 #####################################
 # Created on 13 May 2020            #
-# Modified on 15 May 2020           #
+# Modified on 18 August 2020        #
 #                                   #
 # @author: siddharth-kumar-singh    #
 #####################################
+# Changelog:                        
+# 18-Aug-2020: Modified code for BSE sectoral indices
+#####################################
 # %%
-import pandas as pd, numpy as np, math, time
+import pandas as pd, numpy as np, math, time, requests as req, io
 from datetime import datetime, timedelta
 
 def get_capm_data():
@@ -34,14 +37,12 @@ def get_capm_data():
     ###### BSE indices data
     from_date = datetime(year=2020,month=2,day=3).strftime('%d/%m/%Y')
     to_date = datetime.today().strftime('%d/%m/%Y')
+    headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:81.0) Gecko/20100101 Firefox/81.0'}
     for idx in i2_list.index:
         time.sleep(1)
         url = f'http://api.bseindia.com/BseIndiaAPI/api/ProduceCSVForDate/w?strIndex={idx}&dtFromDate={from_date}&dtToDate={to_date}'
-        #try:
-        df = pd.read_csv(url, index_col=0, infer_datetime_format=True, usecols=[0,4], squeeze=True, dtype=np.float64, parse_dates=[0],encoding='utf-8')
-        #except:
-        #    print(idx)
-        #    continue
+        r = req.get(url=url,headers=headers).content
+        df = pd.read_csv(io.StringIO(r.decode('utf-8')), infer_datetime_format=True, index_col=0, usecols=[0,4], dtype=np.float64, parse_dates=True)
         df.dropna(axis=1,inplace=True)
         df.insert(loc=0,column='Name',value=i2_list.at[idx,'Name'])
         df = df.reset_index().rename(columns={'index':'Date','Date':'Close'})
@@ -91,3 +92,5 @@ def get_capm_data():
         scrip_data = scrip_data.append(df,ignore_index=True)
     print('\tScrips data complete')
     return idx_data, i2_data, scrip_data
+#get_capm_data()
+# %%
